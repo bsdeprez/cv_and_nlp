@@ -129,6 +129,5 @@ dmypy.json
 .pyre/
 
 # Data folder
-Data/
 Models/
 .idea/
