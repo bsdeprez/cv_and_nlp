@@ -6,7 +6,7 @@ from torch.utils.data import Dataset
 
 class RSTPReid(Dataset):
 
-    def __init__(self, dataset_directory: Path, split, feature_extractor):
+    def __init__(self, dataset_directory: Path, split, feature_extractor, tokenizer):
         # Set root directory for the images.
         self._image_folder = dataset_directory / 'imgs'
         if not self._image_folder.exists():
@@ -22,18 +22,18 @@ class RSTPReid(Dataset):
         # Split in the requested data set.
         filter_object = filter(lambda x: x['split'] == split, self._df)
         self._df = list(filter_object)
-        # Store the feature extractor. This will be used in the __get_item()__ method to make sure the image is returned
-        # correctly.
+        # Store the feature extractor and tokenizer.
         self._feature_extractor = feature_extractor
+        self._tokenizer = tokenizer
 
     def __len__(self):
         return len(self._df)
 
     def __getitem__(self, index):
         example = self._df[index]
-        caption = example["captions"][0]
+        captions = self._tokenize_caption(example['captions'])
         pixel_values = self._preprocess_image(example["img_path"])
-        return pixel_values, caption
+        return pixel_values, captions[0]
 
     def _preprocess_image(self, image_name):
         image_file_name = self._image_folder / image_name
@@ -44,3 +44,7 @@ class RSTPReid(Dataset):
         pixel_values = None
         i_image.close()
         return pixel_values
+    
+    def _tokenize_caption(self, captions):
+        labels = self._tokenizer(captions, padding="max_length", max_target_length=25).input_ids
+        return labels;
