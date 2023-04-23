@@ -1,8 +1,7 @@
 from pathlib import Path
 import json
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 from PIL import Image
-from transformers import GPT2TokenizerFast, ViTImageProcessor, VisionEncoderDecoderModel
 
 class RSTPReid(Dataset):
     """
@@ -43,11 +42,20 @@ class RSTPReid(Dataset):
         self.max_sequence_length=128  # Important for padding length
 
     def get_example(self, index):
+        """ 
+        Returns an example of an entry in the RSTPReid dataset before preprocessing.
+        
+        :param index: The index of the example.
+        :type index: int
+        """
         example = self._df[index]
         example['img_path'] = self._image_folder / example['img_path']
         return example
 
     def __len__(self):
+        """
+        Returns the number of entries in the dataset.
+        """
         return len(self._df)
 
     def __getitem__(self, index):
@@ -55,6 +63,7 @@ class RSTPReid(Dataset):
         Iterator over the dataset.
         
         :param index: Index for accessing the flat image-caption pairs.
+        :type index: int
         """
         item = self._df[index]
         id = item['id']
@@ -62,6 +71,13 @@ class RSTPReid(Dataset):
         return id, pixel_values, item['captions'][0]
     
     def _get_pixel_values(self, image_name):
+        """
+        Preprocess the image.
+        This method starts by converting the image to RGB, and then uses a predefined feature extractor to 
+        select the most interesting features.
+        
+        :rtype: torch.Tensor
+        """
         image_path = self._image_folder / image_name
         i_image = Image.open(image_path)
         if i_image.mode != 'RGB':
@@ -69,29 +85,3 @@ class RSTPReid(Dataset):
         pixel_values = self._image_processor(images=[i_image], return_tensors='pt').pixel_values
         i_image.close()
         return pixel_values
-
-
-
-if __name__ == '__main__':
-    path = Path().resolve().parent / 'Data' / 'RSTPReid'
-    image_processor = ViTImageProcessor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-    val_set = RSTPReid(path, 'val', image_processor)
-    """
-    model = VisionEncoderDecoderModel.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-    image_processor = ViTImageProcessor.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-    tokenizer = GPT2TokenizerFast.from_pretrained("nlpconnect/vit-gpt2-image-captioning")
-    path = Path().resolve().parent / 'Data' / 'RSTPReid'
-    assert path.exists()
-    val_set = RSTPReid(path, 'val', image_processor)
-    dataloader = DataLoader(val_set, batch_size=1, shuffle=False)
-    model.train()
-    for i in range(1):
-        batch = next(iter(dataloader))
-        _, pixel_values, captions = batch
-        pixel_values = pixel_values.squeeze(0)
-        labels = tokenizer(captions, padding=True, return_tensors='pt').input_ids
-        print(f"Pixel-values: {pixel_values.shape} ({type(pixel_values)})")
-        print(f"Labels: {labels.shape} ({type(labels)})")
-        loss = model(pixel_values=pixel_values, labels=labels).loss
-        print(loss)
-    """
