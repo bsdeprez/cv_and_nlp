@@ -2,7 +2,7 @@ import evaluate
 import torch
 from tqdm import tqdm
 
-def evaluate(model, validation_set, tokenizer, metric="rouge", device=torch.device('cpu')):
+def evaluate_model(model, validation_set, tokenizer, metric="rouge", device=torch.device('cpu')):
     """
     Using huggingfaces built-in evaluation library, calculate a metric for the model.
 
