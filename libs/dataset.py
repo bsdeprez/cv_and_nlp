@@ -52,7 +52,7 @@ class RSTPReid(Dataset):
             i_image.close()
         # Extract the tokens
         tokens = text_tokenizer(captions, padding=True, return_tensors='pt').input_ids
-        return {
+        retun {
             "pixel_values": pixel_values.to(device),
             "labels": tokens.to(device)
         }
