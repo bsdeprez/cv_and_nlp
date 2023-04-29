@@ -4,7 +4,7 @@ from torch.utils.data import Dataset
 
 class RSTPReid(Dataset):
 
-    def __init__(self, path, split):
+    def __init__(self, path, split, tokenizer, ):
         # Verify 
         self._image_folder = path / 'imgs'
         if not self._image_folder.exists():
@@ -29,14 +29,13 @@ class RSTPReid(Dataset):
     
 
     def __getitem__(self, index):
-        example = self._df[index]
         return {
-            "image_path": self._image_folder / example['img_path'],
-            "caption": example['captions'][0]
+            "image_path": self._image_folder / self._df[index]['img_path'],
+            "caption": self._df[index]['captions'][0]
         }
 
     @staticmethod
-    def coallate(batch, text_tokenizer, image_processor, device):
+    def custom_collate(batch, text_tokenizer, image_processor):
         images = []
         captions = []
         for item in batch:

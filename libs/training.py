@@ -26,7 +26,7 @@ def train_one_epoch(model, optimizer, dataloader, epoch, writer=None):
         warmup_iterations = min(1000, len(dataloader)-1)
         lr_scheduler = LinearLR(optimizer, start_factor=warmup_factor, total_iters=warmup_iterations)
 
-    for batch_id, batch in tqdm(enumerate(dataloader), total=len(dataloader), leave=False, desc="Train batch"):
+    for batch_id, batch in tqdm(enumerate(dataloader), total=len(dataloader), desc="Train batch"):
         pixel_values, labels = batch["pixel_values"], batch["labels"]
         loss = model(pixel_values=pixel_values, labels=labels).loss
         loss_value = loss.item()
