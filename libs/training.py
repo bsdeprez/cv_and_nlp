@@ -3,7 +3,7 @@ import math
 from torch.optim.lr_scheduler import LinearLR
 from tqdm import tqdm
 
-def train_one_epoch(model, optimizer, dataloader, epoch, writer=None):
+def train_one_epoch(model, optimizer, dataloader, epoch, tokenizer, device, writer=None):
     """ Train the model for one epoch.
 
     The implementation of this class is based on:
@@ -27,8 +27,9 @@ def train_one_epoch(model, optimizer, dataloader, epoch, writer=None):
         lr_scheduler = LinearLR(optimizer, start_factor=warmup_factor, total_iters=warmup_iterations)
 
     for batch_id, batch in tqdm(enumerate(dataloader), total=len(dataloader), desc="Train batch"):
-        pixel_values, labels = batch["pixel_values"], batch["labels"]
-        loss = model(pixel_values=pixel_values, labels=labels).loss
+        pixel_values, captions = batch
+        tokens = tokenizer(captions, return_tensors="pt", padding=True).input_ids
+        loss = model(pixel_values=pixel_values.to(device), labels=tokens.to(device)).loss
         loss_value = loss.item()
         if not math.isfinite(loss_value):
             print(f"Loss is {loss_value}, stopping training.")
