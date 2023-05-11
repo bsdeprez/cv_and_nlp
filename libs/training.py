@@ -28,7 +28,10 @@ def train_one_epoch(model, optimizer, dataloader, epoch, tokenizer, device, writ
 
     for batch_id, batch in tqdm(enumerate(dataloader), total=len(dataloader), desc="Train batch"):
         pixel_values, captions = batch
-        tokens = tokenizer(captions, return_tensors="pt", padding=True).input_ids
+        tokens = tokenizer(captions, return_tensors="pt", padding="max_length", max_length=73, truncation=True).input_ids
+        # Batch size of 1 makes the model crash. This can sometimes happen with the last batch.
+        if pixel_values.shape[0] == 3:
+            pixel_values = pixel_values.expand([1, 3, 224, 224])
         loss = model(pixel_values=pixel_values.to(device), labels=tokens.to(device)).loss
         loss_value = loss.item()
         if not math.isfinite(loss_value):

@@ -133,3 +133,6 @@ Models/
 .idea/
 Data/
 runs/
+best_model_padding_true/
+retrained_model/
+training/
