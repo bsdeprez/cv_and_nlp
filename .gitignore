@@ -129,7 +129,7 @@ dmypy.json
 .pyre/
 
 # Data folder
-Models/
+Models/retrained_model/
 .idea/
 Data/
 runs/
