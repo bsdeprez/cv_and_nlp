@@ -30,3 +30,30 @@ An example dataset can be found [here](https://www.kaggle.com/datasets/rajkumarl
 
 ### **Fashion Product Images**
 We could also train the model on just clothing specific information (found [here](https://www.kaggle.com/datasets/paramaggarwal/fashion-product-images-small)).
+
+## Project Structure
+
+### libs
+This directory contains some handwritten python libraries which we used to load in the RSTPReid data and train the ViT-GPT2 model.
+
+### Detr-resnet-Picture.py
+
+
+### Evaluation of the full pipeline - Part 1.ipynb 
+This notebook contains the first half of the evaluation on the full pipeline. Since our model consists of three separate parts, each connected to each other, we've parsed the testset model per model (the VSC didn't like it when we loaded all three models in memory at the same time). This notebook takes in the hand-annotated test data, lets DETR-ResNet50 snippet all recognized persons out of the images, and creates a snapshot of the results in the form of a csv-file. This csv-file is then read in again, and the ViT-GPT2 model creates captions of all the image-snippets. These transcriptions are then saved again in a csv-file, which will serve as the input for the third part of our pipeline. The notebooks are created in such a way that snapshotting the data does not influence the way our pipeline functions.
+
+### Evaluation of the full pipeline - Part 2.ipynb 
+
+
+### Image captioning.ipynb
+This notebook contains the research done into the ViT-GPT2 model. It starts by investigating the RSTPReid data, which is followed by an initial evaluation of the zero-shot capabilities of the encoder-decoder pair. Then, the model is finetuned on the RSTPReid data, and the training loss and validation metrics are plotted per epoch.
+
+### Initial exploration.ipynb
+
+
+### Sentence similarity_modeltraining.ipynb
+This notebook focusses on the sentence similarity part, based on the RSTPreid dataset. 
+Different model architectures, as well as training approaches are discussed.
+Results on the, self-created validation set, are presented. 
+The finally chosen trained model is saved and afterwards used while testing in ‘Evaluation of the full pipeline - Part 2.ipynb ’
+
